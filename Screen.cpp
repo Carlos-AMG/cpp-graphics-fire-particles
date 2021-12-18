@@ -31,7 +31,7 @@ bool Screen:: init(){
     }
 
     m_buffer = new Uint32[SCREEN_WIDTH * SCREEN_HEIGHT]; //32 bit integer for all systems to represent all the pixels on the screen
-    memset(m_buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(Uint32)); // turn screen black
+    //memset(m_buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(Uint32)); // turn screen black
     return true;
 }
 void Screen:: close(){
@@ -60,6 +60,9 @@ void Screen::update(){
 
 void Screen::setPixel(int x, int y, Uint8 red, Uint8 green, Uint8 blue){
     // Method to make the color value an RGBA value
+    if (x < 0 or x >= SCREEN_WIDTH or y < 0 or y >= SCREEN_HEIGHT){
+        return;
+    }
     Uint32 color {};
     color += red;
     color <<= 8;
