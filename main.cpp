@@ -10,7 +10,6 @@
 
 
 int main(int argv, char** args){
-
     std::srand(time(NULL));
     Screen screen;
     if (screen.init() == false){
@@ -23,6 +22,8 @@ int main(int argv, char** args){
     while (1)
     {
         int time_ms = SDL_GetTicks();
+        screen.clear();
+        Zergs.update(time_ms);
         unsigned char green = (1 + sin(time_ms * 0.0001)) * 128; // unsigned char for it to be 1 byte and have a maximum value of 255
         unsigned char red = (1 + sin(time_ms * 0.0002)) * 128;
         unsigned char blue = (1 + sin(time_ms * 0.0003)) * 128;
@@ -30,14 +31,11 @@ int main(int argv, char** args){
         for (int i = 0; i < Swarm::NPARTICLES; i++){
             Particle particle = pParticles[i];
             int x = (particle.m_xcoord + 1) * screen.SCREEN_WIDTH / 2;
-            int y = (particle.m_ycoord + 1) * screen.SCREEN_HEIGHT / 2;
+            int y = particle.m_ycoord * screen.SCREEN_WIDTH / 2 + screen.SCREEN_HEIGHT/2;
             screen.setPixel(x, y, red, green, blue);
             
         }
-
-        
-        
-        
+      
         screen.update();
         if (!(screen.processEvents())){
             break;
