@@ -22,7 +22,6 @@ int main(int argv, char** args){
     while (1)
     {
         int time_ms = SDL_GetTicks();
-        screen.clear();
         Zergs.update(time_ms);
         unsigned char green = (1 + sin(time_ms * 0.0001)) * 128; // unsigned char for it to be 1 byte and have a maximum value of 255
         unsigned char red = (1 + sin(time_ms * 0.0002)) * 128;
@@ -35,7 +34,7 @@ int main(int argv, char** args){
             screen.setPixel(x, y, red, green, blue);
             
         }
-      
+        screen.boxBlur();
         screen.update();
         if (!(screen.processEvents())){
             break;

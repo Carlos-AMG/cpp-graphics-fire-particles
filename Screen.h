@@ -10,6 +10,7 @@ private:
     SDL_Renderer *m_renderer;
     SDL_Texture *m_texture;
     Uint32  *m_buffer;
+    Uint32  *m_bufferSecondary;
 public:
     static const int SCREEN_WIDTH = 800;
     static const int SCREEN_HEIGHT = 600;
@@ -19,7 +20,7 @@ public:
     bool processEvents();
     void update();
     void setPixel(int, int, Uint8, Uint8, Uint8);
-    void clear();
+    void boxBlur();
 };
 
 #endif

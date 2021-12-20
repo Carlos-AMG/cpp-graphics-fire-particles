@@ -1,7 +1,7 @@
 #include "Screen.h"
 #include <string.h>
 
-Screen:: Screen(): m_window(NULL), m_renderer(NULL), m_texture(NULL), m_buffer(NULL){
+Screen:: Screen(): m_window(NULL), m_renderer(NULL), m_texture(NULL), m_buffer(NULL), m_bufferSecondary(NULL){
 
 }
 bool Screen:: init(){
@@ -31,11 +31,14 @@ bool Screen:: init(){
     }
 
     m_buffer = new Uint32[SCREEN_WIDTH * SCREEN_HEIGHT]; //32 bit integer for all systems to represent all the pixels on the screen
-    memset(m_buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(Uint32)); // turn screen black
+    m_bufferSecondary = new Uint32[SCREEN_WIDTH * SCREEN_HEIGHT];
+    memset(m_buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(Uint32)); // clear the buffer
+    memset(m_bufferSecondary, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(Uint32));
     return true;
 }
 void Screen:: close(){
     delete [] m_buffer;
+    delete [] m_bufferSecondary;
     SDL_DestroyRenderer(m_renderer);
     SDL_DestroyTexture(m_texture);
     SDL_DestroyWindow(m_window);
@@ -74,6 +77,36 @@ void Screen::setPixel(int x, int y, Uint8 red, Uint8 green, Uint8 blue){
     m_buffer[y * SCREEN_WIDTH + x] = color;
 }
 
-void Screen::clear(){
-    memset(m_buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(Uint32));
+void Screen::boxBlur(){
+    Uint32 *temp = m_buffer;
+    m_buffer = m_bufferSecondary;
+    m_bufferSecondary = temp;
+    for(int y = 0; y < SCREEN_HEIGHT; y++){
+        for (int x = 0; x < SCREEN_WIDTH; x++){
+            int redTotal = 0;
+            int greenTotal = 0;
+            int blueTotal = 0;
+
+            for (int row = -1; row <= 1; row++){
+                for (int col = -1; col <= 1; col++){
+                    int currentXpos = x + col;
+                    int currentYpos = y + row;
+
+                    if (currentXpos >= 0 and currentXpos < SCREEN_WIDTH and currentYpos >= 0 and currentYpos < SCREEN_HEIGHT){
+                        Uint32 colour = m_bufferSecondary[currentYpos * SCREEN_WIDTH + currentXpos];
+                        Uint8 red = colour >> 24;
+                        Uint8 green = colour >> 16;
+                        Uint8 blue = colour >> 8;
+                        redTotal += red;
+                        greenTotal += green;
+                        blueTotal += blue;
+                    }
+                }
+            }
+            Uint8 red = redTotal/9;
+            Uint8 green = greenTotal/9;
+            Uint8 blue = blueTotal/9;
+            setPixel(x, y, red, green, blue); 
+        }
+    }
 }
